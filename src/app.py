@@ -57,14 +57,14 @@ with st.spinner("AI is thinking..."):
             "What is the revenue for the month of January?"
         ],
     )
-    st.write(result.choices[0].message.content)
+    # st.write(result.choices[0].message.content)
     response = result.choices[0].message.content
     with st.chat_message("Output"):
         st.write(response)
         prompt = st.chat_input("User")
 
-        # if prompt:
-        #     system_prompt = "Base your answer on this given information: {}".format(response)
-        #     st.write(prompt)
-        #     response = model([SystemMessage(content=system_prompt), HumanMessage(content=prompt)])
-        #     st.write("AI Agent").write(response.content)
+        if prompt:
+            system_prompt = "Base your answer on this given information: {}".format(response)
+            st.write(prompt)
+            response = model([SystemMessage(content=system_prompt), HumanMessage(content=prompt)])
+            st.write("AI Agent").write(response.content)
