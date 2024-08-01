@@ -6,7 +6,7 @@ import utils
 from AI.ContextData import ContextData
 from AI.AI import AI
 from langchain.schema import SystemMessage,HumanMessage
-
+from openai import OpenAI
 st.set_page_config(layout="wide")
 # Load the data
 df_unfiltered = pd.read_csv('test_data.csv')
@@ -31,10 +31,10 @@ if alterprice:
     # The fixed price required to match the dynamic revenue
     required_price = df['invoiced_revenue'].sum() / df['Generation'].sum()
     st.write(f'The fixed price required to match the dynamic revenue is: £{required_price.round(2)}')
-    st.dataframe(df[['date','invoiced_revenue','calculated_revenue','Generation']], width=1000, height=300,hide_index=True)
+    st.dataframe(df[['date','invoiced_revenue','calculated_revenue','Generation']], height=300,hide_index=True,use_container_width=True)
 else:
     st.plotly_chart(vis.get_comparison_chart(df, 'datetime', 'invoiced_revenue', 'calculated_revenue', 'Invoiced vs Calculated Revenue'))
-    st.dataframe(df[['date','invoiced_revenue','calculated_revenue','Generation']], width=1000, height=300,hide_index=True)
+    st.dataframe(df[['date','invoiced_revenue','calculated_revenue','Generation']], height=300,hide_index=True, use_container_width=True)
 selected_supplementary_data = st.selectbox('Select the additional data to display', ['energy_yield','system_losses','inverter_efficiency','mean_array_efficiency','reference_yield'])
 
 st.plotly_chart(vis.get_line_chart(df, 'datetime', selected_supplementary_data, selected_supplementary_data))
@@ -48,23 +48,35 @@ aiClient.initialise_context([
     ContextData("test_data.csv", "Revenue Data")
 ])
 
+# Initialize a session state variable to track if the initial function has run
+if 'initial_run_done' not in st.session_state:
+    st.session_state.initial_run_done = False
 
-with st.spinner("AI is thinking..."):
-    result = aiClient.create_summary(
-        [
-            "What is the average revenue?",
-            "What is the total revenue?",
-            "What is the revenue for the month of January?"
-        ],
-    )
-    # st.write(result.choices[0].message.content)
-    response = result.choices[0].message.content
+# Only run the initial function if it hasn't been run yet
+if not st.session_state.initial_run_done:
+    with st.spinner("AI is thinking..."):
+        result = aiClient.create_summary(
+            [
+                "What are the most important factors impacting generation? I am particularly interested in the impact of weather.",
+                "What are the trends in revenue based on the time of year? When would be a good time for maintenance?",
+                "How can we increase our revenue going forward based on this data?"
+            ]
+        )
+    # Store the result in session state
+    st.session_state.initial_result = result.choices[0].message.content
+    st.session_state.initial_run_done = True
+
+# Display the initial result if it exists
+if 'initial_result' in st.session_state:
+    response = st.session_state.initial_result
     with st.chat_message("Output"):
         st.write(response)
-        prompt = st.chat_input("User")
 
-        if prompt:
-            system_prompt = "Base your answer on this given information: {}".format(response)
-            st.write(prompt)
-            response = model([SystemMessage(content=system_prompt), HumanMessage(content=prompt)])
-            st.write("AI Agent").write(response.content)
+# Chat input should be at the bottom
+prompt = st.chat_input("User")
+
+if prompt:
+    system_prompt = "Base your answer on this given information: {}".format(response)
+    st.write(prompt)
+    response = model([SystemMessage(system_prompt), HumanMessage(prompt)])
+    st.write(response.content)

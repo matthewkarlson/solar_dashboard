@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 
 def display_custom_block(title, col):
     html_content = f"""
-    <div style = "text-align: center; border: 3px solid lightgreen; border-radius: 10px;">
+    <div style = "text-align: center; border: 3px solid lightblue; border-radius: 10px;">
         <h3>{title}</h3>
     </div>
     """
@@ -19,7 +19,7 @@ def get_bar_chart(df, x, y, title):
         yaxis_title='Revenue',
         xaxis_tickangle=-45
     )
-    fig.update_traces(marker_color='lightgreen')
+    fig.update_traces(marker_color='lightblue')
     return fig
 
 def get_comparison_chart(df, x, y1, y2, title):
@@ -29,14 +29,14 @@ def get_comparison_chart(df, x, y1, y2, title):
         x=df[x],
         y=df[y1],
         name=y1,
-        marker_color = 'darkgreen'
+        marker_color = 'darkblue'
     ))
 
     fig.add_trace(go.Bar(
         x=df[x],
         y=df[y2],
         name=y2,
-        marker_color = 'lightgreen'
+        marker_color = 'lightblue'
     ))
 
     fig.update_layout(

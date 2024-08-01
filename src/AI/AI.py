@@ -98,7 +98,7 @@ class AI:
         answers = self.answer_questions(questions)
         prompt = prompts.SUMMARY_PROMPT_TEMPLATE.format(
             questions_and_answers = "\n".join([f"Q: {q}\nA: {a}" for q,a in zip(questions, answers)]),
-            length_of_summary = "200 word"
+            length_of_summary = "detailed and comprehensive, not excessive but enough to provide a clear and concise summary"
         )
 
         chat_completion = self.openAIClient.chat.completions.create(

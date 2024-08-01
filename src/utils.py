@@ -5,3 +5,4 @@ def create_openai_chat(api_key, model, temperature):
         model = model, 
         temperature =temperature
         )
+    return model
