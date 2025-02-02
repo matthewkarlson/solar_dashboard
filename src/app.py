@@ -55,6 +55,7 @@ if 'initial_run_done' not in st.session_state:
 # Only run the initial function if it hasn't been run yet
 if not st.session_state.initial_run_done:
     with st.spinner("AI is thinking..."):
+        # TODO: make the questions editable by users
         result = aiClient.create_summary(
             [
                 "What are the most important factors impacting generation? I am particularly interested in the impact of weather.",

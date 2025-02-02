@@ -3,3 +3,4 @@ src/__pycache__
 .streamlit/
 *__pycache__
 .cache/
+.DS_Store
